@@ -216,9 +216,9 @@ public class ConsoleRouletteGameApplication implements CommandLineRunner {
 				String previousBetAmount = player.split(",")[2];
 				dataToWrite = "\n".concat(playerName)
 						.concat(",")
-						.concat(String.valueOf(Integer.parseInt(previousWinning) + Integer.valueOf(winnings)))
+						.concat(String.valueOf(Integer.parseInt(previousWinning) + Integer.parseInt(winnings)))
 						.concat(",")
-						.concat(String.valueOf(Integer.parseInt(previousBetAmount) + Integer.valueOf(betAmount)));
+						.concat(String.valueOf(Integer.parseInt(previousBetAmount) + Integer.parseInt(betAmount)));
 				// Append to summary data
 				summaryData.add(dataToWrite);
 			}
