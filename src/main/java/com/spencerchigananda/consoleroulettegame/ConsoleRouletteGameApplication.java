@@ -61,16 +61,6 @@ public class ConsoleRouletteGameApplication implements CommandLineRunner {
 			System.out.println("Ball number is " + c);
 
 
-			// Place a bet
-			/*String bet = textIO.newStringInputReader().read("\n \n Place your bet: ");
-			// Split bet string by spaces to get player name, bet placed, and amount
-			String playerName = bet.split("\\s+")[0];
-			String betPlaced = bet.split("\\s+")[1];
-			String betAmount = bet.split("\\s+")[2];
-
-			// Test print to see if bets properly split
-			System.out.println("Player: ".concat(playerName).concat("\n Bet Placed: ").concat(betPlaced).concat("\n Bet amount: ").concat(betAmount));*/
-
 			// Place bets in a list to allow multiple bets from same user
 			List<String> bets = new ArrayList<>();
 			bets = textIO.newStringInputReader().readList("\n\nPlace your bet (comma separated if many): ");
