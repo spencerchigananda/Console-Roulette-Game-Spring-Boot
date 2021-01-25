@@ -1,13 +1,19 @@
 package com.spencerchigananda.consoleroulettegame;
 
+import com.spencerchigananda.consoleroulettegame.models.Bet;
+import com.spencerchigananda.consoleroulettegame.services.BetResultService;
+import com.spencerchigananda.consoleroulettegame.services.BetService;
+import com.spencerchigananda.consoleroulettegame.services.PlayerService;
 import org.beryx.textio.TextIO;
 import org.beryx.textio.TextIoFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 
 import java.io.*;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -15,6 +21,17 @@ import java.util.Timer;
 
 @SpringBootApplication
 public class ConsoleRouletteGameApplication implements CommandLineRunner {
+
+	private final PlayerService playerService;
+	private final BetResultService betResultService;
+	private final BetService betService;
+
+	@Autowired
+	public ConsoleRouletteGameApplication(PlayerService playerService, BetResultService betResultService, BetService betService) {
+		this.playerService = playerService;
+		this.betResultService = betResultService;
+		this.betService = betService;
+	}
 
 	/*public static void main(String[] args) {
 		SpringApplication.run(ConsoleRouletteGameApplication.class, args);
@@ -45,6 +62,8 @@ public class ConsoleRouletteGameApplication implements CommandLineRunner {
 		// List to hold all the bets
 		List<String> betsList = new ArrayList<>();
 
+		List<Bet> betList = new ArrayList<>();
+
 		// Display players
 		textIO.getTextTerminal().printf("\nWelcome to Console Roulette v1.\n PLAYERS: ");
 		for (String gamePlayer: players) {
@@ -53,7 +72,7 @@ public class ConsoleRouletteGameApplication implements CommandLineRunner {
 		}
 
 		// Create player_summary file and initialize with default values
-		initializePlayerSummary(players);
+		playerService.initializePlayerSummary(players);
 
 		// Schedule the timer for selecting random numbers every 30 seconds
 		Timer timer = new Timer();
@@ -70,53 +89,29 @@ public class ConsoleRouletteGameApplication implements CommandLineRunner {
 			//betsList.add(bets);
 
 			// Check bet and print ball number and winnings
-			checkBet(bets, c, textIO);
+			//checkBet(bets, c, textIO);
+			bets.forEach(b ->{
+				Bet bet = new Bet();
+				bet.setPlayer(b.split("\\s+")[0]);
+				bet.setBetPlaced(b.split("\\s+")[1]);
+				bet.setAmount(new BigDecimal(b.split("\\s+")[2]));
+
+				// Save bet to database
+				bet = betService.add(bet);
+
+				// Print bet
+				System.out.println("BET******* ".concat(bet.toString()));
+
+				betList.add(bet);
+			});
+			betResultService.checkBet(betList, c, textIO);
 
 			// Clear list after check bets
 			bets.clear();
+			betList.clear();
 
 		}), 0, 30000);
 
-	}
-
-	private void initializePlayerSummary(List<String> players) {
-		File playerSummaryFile = new File("src/main/resources/player_summary.txt");
-		String initialSummary = "";
-		try {
-			if (playerSummaryFile.createNewFile()) {
-				System.out.println("File created: " + playerSummaryFile.getName());
-				// Write to summary with default values
-				BufferedWriter writer = null;
-				try {
-					writer = new BufferedWriter(new FileWriter("src/main/resources/player_summary.txt"));
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				try {
-					// Append to text file
-					for (String gamePlayer: players) {
-						initialSummary = gamePlayer
-								.concat(",")
-								.concat("0").concat(",")
-								.concat("0").concat("\n");
-						writer.write(initialSummary);
-
-					}
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-
-				try {
-					writer.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			} else {
-				System.out.println("File already exists.");
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 	private void checkBet(List<String> betsList, Integer ballNumber, TextIO textIO) {
