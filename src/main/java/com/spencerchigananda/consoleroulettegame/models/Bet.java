@@ -1,9 +1,6 @@
 package com.spencerchigananda.consoleroulettegame.models;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Objects;
 
@@ -16,6 +13,7 @@ public class Bet {
 
     @Id
     @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer getId() {
         return id;
     }
@@ -65,5 +63,15 @@ public class Bet {
     @Override
     public int hashCode() {
         return Objects.hash(id, player, betPlaced, amount);
+    }
+
+    @Override
+    public String toString() {
+        return "Bet{" +
+                "id=" + id +
+                ", player='" + player + '\'' +
+                ", betPlaced='" + betPlaced + '\'' +
+                ", amount=" + amount +
+                '}';
     }
 }
